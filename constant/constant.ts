@@ -1,27 +1,27 @@
 export const NavLinks =[
     {
         id:1,
-        url:"http://localhost:3000",
+        url:"https://frontend-v3kp.vercel.app",
         Label:"Home"
     },
     {
         id:2,
-        url:"http://localhost:3000/detection",
+        url:"https://frontend-v3kp.vercel.app/detection",
         Label:"Detection"
     },
     {
         id:3,
-        url: "http://localhost:3000/about",
+        url: "https://frontend-v3kp.vercel.app/about",
         Label:"About"
     },
     {
         id:4,
-        url:"http://localhost:3000/terms",
+        url:"https://frontend-v3kp.vercel.app/terms",
         Label:"Terms"
     },
     {
         id:5,
-        url:"http://localhost:3000/contact",
+        url:"https://frontend-v3kp.vercel.app/contact",
         Label:"Contact"
     }
 ]
