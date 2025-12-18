@@ -117,7 +117,7 @@ export default function CameraDetectionSplit() {
         0.6
       );
 
-      setTimeout(send, 350); // ✅ Render-friendly FPS
+      setTimeout(send, 700); // ✅ Render-friendly FPS
     };
 
     send();
