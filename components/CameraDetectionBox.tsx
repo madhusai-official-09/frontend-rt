@@ -11,10 +11,8 @@ export default function CameraDetectionSplit() {
   const [annotatedSrc, setAnnotatedSrc] = useState<string | null>(null);
   const WS =
   typeof window !== "undefined"
-    ? `${location.protocol === "https:" ? "wss" : "ws"}://${location.hostname}:8000/ws`
+    ? process.env.NEXT_PUBLIC_WS_URL!
     : "";
-
-
 
 
   useEffect(() => () => wsRef.current?.close(), []);
