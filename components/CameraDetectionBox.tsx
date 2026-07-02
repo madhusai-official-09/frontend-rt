@@ -15,6 +15,7 @@ export default function CameraDetectionSplit() {
   const [started, setStarted] = useState(false);
   const [annotatedSrc, setAnnotatedSrc] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
   const WS =
     typeof window !== "undefined" ? process.env.NEXT_PUBLIC_WS_URL || "" : "";
@@ -51,8 +52,6 @@ export default function CameraDetectionSplit() {
         return;
       }
 
-      // Don't send a new frame until the server has replied to the last one.
-      // This is what keeps the preview from falling behind on a slow backend.
       if (waitingForResponseRef.current) {
         timeoutRef.current = setTimeout(send, 30);
         return;
@@ -91,7 +90,9 @@ export default function CameraDetectionSplit() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user" },
+        video: { facingMode: ideal: facingMode, },
+        width: {ideal: 640},
+        height: {ideal: 480},
         audio: false,
       });
 
@@ -169,29 +170,55 @@ export default function CameraDetectionSplit() {
     setLoading(false);
   };
 
+  const flipCamera = async () => {
+  if (loading) return;
+
+  const wasRunning = started;
+
+  stop();
+
+  setFacingMode((prev) =>
+    prev === "user" ? "environment" : "user"
+  );
+
+  setTimeout(() => {
+    if (wasRunning) {
+      start();
+    }
+  }, 300);
+};
+
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#041014] p-4 rounded gap-3">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between bg-[#041014] rounded-xl p-4 gap-4">
         <div className="text-white">
           <div className="font-semibold">Real-Time Object Detection</div>
           <div className="text-sm text-gray-400">Camera & Object Preview</div>
         </div>
 
-        <div className="flex w-full sm:w-auto gap-3">
+        <div className="grid grid-cols-3 sm:flex gap-2 w-full sm:w-auto">
           <button
-            onClick={start}
-            disabled={loading || started}
-            className="flex-1 sm:flex-none px-4 py-2 bg-red-600 text-black font-medium rounded disabled:opacity-40 disabled:cursor-not-allowed hover:bg-red-500 transition-colors"
-          >
-            {loading ? "Starting…" : "Start"}
-          </button>
-          <button
-            onClick={stop}
-            disabled={!started}
-            className="flex-1 sm:flex-none px-4 py-2 bg-gray-700 text-white font-medium rounded disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
-          >
-            Stop
-          </button>
+  onClick={start}
+  disabled={loading || started}
+  className="px-4 py-2 rounded bg-red-600 text-black font-semibold hover:bg-red-500 disabled:opacity-40 transition"
+>
+  {loading ? "Starting..." : "Start"}
+</button>
+
+<button
+  onClick={stop}
+  disabled={!started}
+  className="px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-40 transition"
+>
+  Stop
+</button>
+
+<button
+  onClick={flipCamera}
+  className="px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition"
+>
+  Flip
+</button>
         </div>
       </div>
 
@@ -203,15 +230,15 @@ export default function CameraDetectionSplit() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Live Camera */}
-        <div className="bg-[#061014] p-4 rounded border border-cyan-600/20">
+        <div className="bg-[#061014] rounded-xl p-3 sm:p-4 border border-cyan-600/20 shadow-lg">
           <h4 className="text-white font-semibold mb-3">Live Camera</h4>
-          <div className="relative bg-black rounded-lg overflow-hidden aspect-[4/3] w-full flex items-center justify-center">
+          <div className="relative bg-black rounded-lg overflow-hidden aspect-video sm:aspect-[4/3] w-full flex items-center justify-center">
             <video
               ref={videoRef}
               autoPlay
               muted
               playsInline
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain bg-black"
             />
             {!started && (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
@@ -233,12 +260,12 @@ export default function CameraDetectionSplit() {
         {/* Detection Preview */}
         <div className="bg-[#061014] p-4 rounded border border-cyan-600/20">
           <h4 className="text-white font-semibold mb-3">Object Preview</h4>
-          <div className="bg-black rounded-lg overflow-hidden aspect-[4/3] w-full flex items-center justify-center">
+          <div className="bg-black rounded-lg overflow-hidden aspect-video sm:aspect-[4/3] w-full flex items-center justify-center">
             {annotatedSrc ? (
               <img
                 src={annotatedSrc}
                 alt="Detection"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-balck"
               />
             ) : (
               <div className="text-center text-gray-400 px-4">
