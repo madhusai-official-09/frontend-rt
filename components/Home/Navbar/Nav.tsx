@@ -83,7 +83,7 @@ const Nav: React.FC<Props> = ({ openNav }) => {
         {/* actions */}
         <div className="flex items-center space-x-4">
           <Button
-            onClick={() => (window.location.href = "http://localhost:3000/detection")}
+            onClick={() => (window.location.href = "https://frontend-v3kp.vercel.app/detection")}
             className="px-6 py-2.5 text-sm rounded-lg bg-red-600 hover:bg-red-700 transition-all duration-300 text-black flex items-center space-x-2"
           >
             {/* use size prop for icons to avoid typing issues */}
