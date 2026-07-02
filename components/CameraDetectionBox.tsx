@@ -208,14 +208,14 @@ export default function CameraDetectionSplit() {
           <button
             onClick={stop}
             disabled={!started}
-            className="px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-40 transition"
+            className="px-4 py-2 rounded bg-gray-700 text-white font-semibold hover:bg-gray-600 disabled:opacity-40 transition"
           >
             Stop
           </button>
 
           <button
             onClick={flipCamera}
-            className="px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition"
+            className="px-4 py-2 rounded bg-red-600 text-black font-semibold hover:bg-red-500 disabled:opacity-40 transition"
           >
             Flip
           </button>
@@ -232,13 +232,13 @@ export default function CameraDetectionSplit() {
         {/* Live Camera */}
         <div className="bg-[#061014] rounded-xl p-3 sm:p-4 border border-cyan-600/20 shadow-lg">
           <h4 className="text-white font-semibold mb-3">Live Camera</h4>
-          <div className="relative bg-black rounded-lg overflow-hidden aspect-video sm:aspect-[4/3] w-full flex items-center justify-center">
+          <div className="relative bg-black rounded-lg overflow-hidden w-full h-64 sm:h-80 lg:h-96 flex items-center justify-center">
             <video
               ref={videoRef}
               autoPlay
               muted
               playsInline
-              className="w-full h-full object-contain bg-black"
+              className="w-full h-full object-cover bg-black"
             />
             {!started && (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
@@ -260,12 +260,12 @@ export default function CameraDetectionSplit() {
         {/* Detection Preview */}
         <div className="bg-[#061014] rounded-xl p-3 sm:p-4 border border-cyan-600/20 shadow-lg">
           <h4 className="text-white font-semibold mb-3">Object Preview</h4>
-          <div className="bg-black rounded-lg overflow-hidden aspect-video sm:aspect-[4/3] w-full flex items-center justify-center">
+          <div className="bg-black rounded-lg overflow-hidden w-full h-64 sm:h-80 lg:h-96 flex items-center justify-center">
             {annotatedSrc ? (
               <img
                 src={annotatedSrc}
                 alt="Detection"
-                className="w-full h-full object-contain bg-black"
+                className="w-full h-full object-cover bg-black"
               />
             ) : (
               <div className="text-center text-gray-400 px-4">
