@@ -90,9 +90,11 @@ export default function CameraDetectionSplit() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: ideal: facingMode, },
-        width: {ideal: 640},
-        height: {ideal: 480},
+        video: {
+          facingMode: { ideal: facingMode },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
         audio: false,
       });
 
@@ -171,22 +173,20 @@ export default function CameraDetectionSplit() {
   };
 
   const flipCamera = async () => {
-  if (loading) return;
+    if (loading) return;
 
-  const wasRunning = started;
+    const wasRunning = started;
 
-  stop();
+    stop();
 
-  setFacingMode((prev) =>
-    prev === "user" ? "environment" : "user"
-  );
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
 
-  setTimeout(() => {
-    if (wasRunning) {
-      start();
-    }
-  }, 300);
-};
+    setTimeout(() => {
+      if (wasRunning) {
+        start();
+      }
+    }, 300);
+  };
 
   return (
     <div className="p-4 sm:p-6 max-w-6xl mx-auto space-y-6">
@@ -198,27 +198,27 @@ export default function CameraDetectionSplit() {
 
         <div className="grid grid-cols-3 sm:flex gap-2 w-full sm:w-auto">
           <button
-  onClick={start}
-  disabled={loading || started}
-  className="px-4 py-2 rounded bg-red-600 text-black font-semibold hover:bg-red-500 disabled:opacity-40 transition"
->
-  {loading ? "Starting..." : "Start"}
-</button>
+            onClick={start}
+            disabled={loading || started}
+            className="px-4 py-2 rounded bg-red-600 text-black font-semibold hover:bg-red-500 disabled:opacity-40 transition"
+          >
+            {loading ? "Starting..." : "Start"}
+          </button>
 
-<button
-  onClick={stop}
-  disabled={!started}
-  className="px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-40 transition"
->
-  Stop
-</button>
+          <button
+            onClick={stop}
+            disabled={!started}
+            className="px-4 py-2 rounded bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-40 transition"
+          >
+            Stop
+          </button>
 
-<button
-  onClick={flipCamera}
-  className="px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition"
->
-  Flip
-</button>
+          <button
+            onClick={flipCamera}
+            className="px-4 py-2 rounded bg-cyan-600 text-white hover:bg-cyan-500 transition"
+          >
+            Flip
+          </button>
         </div>
       </div>
 
@@ -228,7 +228,7 @@ export default function CameraDetectionSplit() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Live Camera */}
         <div className="bg-[#061014] rounded-xl p-3 sm:p-4 border border-cyan-600/20 shadow-lg">
           <h4 className="text-white font-semibold mb-3">Live Camera</h4>
@@ -258,14 +258,14 @@ export default function CameraDetectionSplit() {
         </div>
 
         {/* Detection Preview */}
-        <div className="bg-[#061014] p-4 rounded border border-cyan-600/20">
+        <div className="bg-[#061014] rounded-xl p-3 sm:p-4 border border-cyan-600/20 shadow-lg">
           <h4 className="text-white font-semibold mb-3">Object Preview</h4>
           <div className="bg-black rounded-lg overflow-hidden aspect-video sm:aspect-[4/3] w-full flex items-center justify-center">
             {annotatedSrc ? (
               <img
                 src={annotatedSrc}
                 alt="Detection"
-                className="w-full h-full object-contain bg-balck"
+                className="w-full h-full object-contain bg-black"
               />
             ) : (
               <div className="text-center text-gray-400 px-4">
