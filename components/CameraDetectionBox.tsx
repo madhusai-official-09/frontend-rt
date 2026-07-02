@@ -9,6 +9,7 @@ export default function CameraDetectionSplit() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const runningRef = useRef(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const waitingForResponseRef = useRef(false);
 
   const [loading, setLoading] = useState(false);
   const [started, setStarted] = useState(false);
@@ -37,6 +38,8 @@ export default function CameraDetectionSplit() {
     canvas.width = 640;
     canvas.height = 480;
 
+    waitingForResponseRef.current = false;
+
     const send = () => {
       if (
         !runningRef.current ||
@@ -48,12 +51,20 @@ export default function CameraDetectionSplit() {
         return;
       }
 
+      // Don't send a new frame until the server has replied to the last one.
+      // This is what keeps the preview from falling behind on a slow backend.
+      if (waitingForResponseRef.current) {
+        timeoutRef.current = setTimeout(send, 30);
+        return;
+      }
+
       const v = videoRef.current;
       if (v.readyState >= 2) {
         ctx.drawImage(v, 0, 0, 640, 480);
         canvas.toBlob(
           (blob) => {
             if (blob && wsRef.current?.readyState === WebSocket.OPEN) {
+              waitingForResponseRef.current = true;
               wsRef.current.send(blob);
             }
           },
@@ -62,7 +73,7 @@ export default function CameraDetectionSplit() {
         );
       }
 
-      timeoutRef.current = setTimeout(send, 100);
+      timeoutRef.current = setTimeout(send, 30);
     };
 
     send();
@@ -106,6 +117,7 @@ export default function CameraDetectionSplit() {
       ws.onmessage = (e) => {
         if (typeof e.data !== "string") {
           console.log("Frame received");
+          waitingForResponseRef.current = false;
           const blob = new Blob([e.data], { type: "image/jpeg" });
           const url = URL.createObjectURL(blob);
           setAnnotatedSrc((prev) => {
@@ -135,6 +147,7 @@ export default function CameraDetectionSplit() {
 
   const stop = () => {
     runningRef.current = false;
+    waitingForResponseRef.current = false;
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setStarted(false);
 
@@ -164,22 +177,22 @@ export default function CameraDetectionSplit() {
           <div className="text-sm text-gray-400">Camera & Object Preview</div>
         </div>
 
-        {!started ? (
+        <div className="flex w-full sm:w-auto gap-3">
           <button
             onClick={start}
-            disabled={loading}
-            className="w-full sm:w-auto px-4 py-2 bg-red-600 text-black rounded disabled:opacity-60"
+            disabled={loading || started}
+            className="flex-1 sm:flex-none px-4 py-2 bg-red-600 text-black font-medium rounded disabled:opacity-40 disabled:cursor-not-allowed hover:bg-red-500 transition-colors"
           >
             {loading ? "Starting…" : "Start"}
           </button>
-        ) : (
           <button
             onClick={stop}
-            className="w-full sm:w-auto px-4 py-2 bg-red-600 text-black rounded"
+            disabled={!started}
+            className="flex-1 sm:flex-none px-4 py-2 bg-gray-700 text-white font-medium rounded disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-600 transition-colors"
           >
             Stop
           </button>
-        )}
+        </div>
       </div>
 
       {errorMsg && (
@@ -209,7 +222,8 @@ export default function CameraDetectionSplit() {
               </div>
             )}
             {started && (
-              <div className="absolute left-3 bottom-3 bg-black/60 text-xs text-white px-2 py-1 rounded">
+              <div className="absolute left-3 bottom-3 flex items-center gap-2 bg-black/60 text-xs text-white px-2 py-1 rounded">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
                 streaming…
               </div>
             )}
